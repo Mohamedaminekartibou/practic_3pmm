@@ -1,69 +1,97 @@
+
 import 'package:flutter/material.dart';
 
-class MovieSlider extends StatelessWidget {
-  // const MovieSlider({Key? key}) : super(key: key);
+class MealSlider extends StatelessWidget {
+  final List<Map<String, String?>> meals;
+
+  const MealSlider({super.key, required this.meals});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 280,
-      // color: Colors.red,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Text('Populars',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            child: Text(
+              'Receptes populars',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           const SizedBox(height: 5),
           Expanded(
             child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 20,
-                itemBuilder: (_, int index) => _MoviePoster()),
-          )
+              scrollDirection: Axis.horizontal,
+              itemCount: meals.length,
+              itemBuilder: (_, int index) {
+                return _MealPoster(meal: meals[index]);
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _MoviePoster extends StatelessWidget {
-  const _MoviePoster({Key? key}) : super(key: key);
+class _MealPoster extends StatelessWidget {
+  final Map<String, String?> meal;
+
+  const _MealPoster({required this.meal});
 
   @override
   Widget build(BuildContext context) {
+    final image = meal['strMealThumb'];
+
     return Container(
       width: 130,
-      // color: Colors.green,
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, 'details',
-                arguments: 'detalls peli'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              'details',
+              arguments: meal,
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: FadeInImage(
-                placeholder: AssetImage('assets/no-image.jpg'),
-                image: NetworkImage('https://placehold.co/300x400/png'),
-                width: 130,
-                height: 190,
-                fit: BoxFit.cover,
-              ),
+              child: image != null && image.isNotEmpty
+                  ? Image.network(
+                      image,
+                      width: 130,
+                      height: 190,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/no-image.jpg',
+                          width: 130,
+                          height: 190,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    )
+                  : Image.asset(
+                      'assets/no-image.jpg',
+                      width: 130,
+                      height: 190,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Text(
-            'Star Wars: El retorno del Jedi',
+            meal['strMeal'] ?? 'Sense nom',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-          )
+          ),
         ],
       ),
     );
