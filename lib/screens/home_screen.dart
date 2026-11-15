@@ -29,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, 'search');
+            },
             icon: const Icon(Icons.search_outlined),
           ),
         ],

@@ -15,8 +15,11 @@ class MealResponse {
         required this.meals,
     });
 
-    factory MealResponse.fromJson(Map<String, dynamic> json) => MealResponse(
-        meals: List<Map<String, String?>>.from(json["meals"].map((x) => Map.from(x).map((k, v) => MapEntry<String, String?>(k, v)))),
+    factory MealResponse.fromJson(Map<String, dynamic> json) =>
+    MealResponse(
+      meals: (json['meals'] as List? ?? [])
+          .map((x) => Map<String, String?>.from(x))
+          .toList(),
     );
 
     Map<String, dynamic> toJson() => {

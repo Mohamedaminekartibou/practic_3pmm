@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/screens/screens.dart';
+import 'package:movies_app/screens/search_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,8 +12,9 @@ class MyApp extends StatelessWidget {
       title: 'Pel·lícules',
       initialRoute: '/',
       routes: {
-        '/': (BuildContext context) => HomeScreen(),
+        '/': (BuildContext context) => const HomeScreen(),
         'details': (BuildContext context) => DetailsScreen(),
+        'search': (BuildContext context) => const SearchScreen(),
       },
       theme: ThemeData.light()
           .copyWith(appBarTheme: const AppBarTheme(backgroundColor: Colors.indigo)),
