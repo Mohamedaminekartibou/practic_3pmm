@@ -1,24 +1,25 @@
+
 import 'package:flutter/material.dart';
-import 'package:movies_app/widgets/widgets.dart';
 
 class DetailsScreen extends StatelessWidget {
+  const DetailsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Canviar després per una instància de Peli
-    final String peli =
-        ModalRoute.of(context)?.settings.arguments.toString() ?? 'no-movie';
+    final meal = ModalRoute.of(context)!.settings.arguments
+        as Map<String, String?>;
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          _CustomAppBar(),
+          _CustomAppBar(meal: meal),
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                _PosterAndTitile(),
-                _Overview(),
-                _Overview(),
-                CastingCards(),
+                _MealHeader(meal: meal),
+                _MealInfo(meal: meal),
+                _Ingredients(meal: meal),
+                _Instructions(meal: meal),
               ],
             ),
           ),
@@ -28,42 +29,42 @@ class DetailsScreen extends StatelessWidget {
   }
 }
 
+// APP BAR
 class _CustomAppBar extends StatelessWidget {
+  final Map<String, String?> meal;
+
+  const _CustomAppBar({required this.meal});
+
   @override
   Widget build(BuildContext context) {
-    // Exactament igual que la AppBaer però amb bon comportament davant scroll
     return SliverAppBar(
       backgroundColor: Colors.indigo,
-      expandedHeight: 200,
+      expandedHeight: 250,
       floating: false,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
-        titlePadding: EdgeInsets.all(0),
-        title: Container(
-          width: double.infinity,
-          alignment: Alignment.bottomCenter,
-          color: Colors.black12,
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Text(
-            'Títol peli',
-            style: TextStyle(fontSize: 16),
+        title: Text(
+          meal['strMeal'] ?? 'Recepta',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white,
           ),
         ),
-        background: FadeInImage(
-          placeholder: AssetImage('assets/loading.gif'),
-          image: NetworkImage('https://placehold.co/500x300/png'),
-          fit: BoxFit.cover,
-        ),
+        background: _mealImage(meal['strMealThumb']),
       ),
     );
   }
 }
 
-class _PosterAndTitile extends StatelessWidget {
+// NOM I FOTOGRAFIA
+class _MealHeader extends StatelessWidget {
+  final Map<String, String?> meal;
+
+  const _MealHeader({required this.meal});
+
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.only(top: 20),
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -71,54 +72,170 @@ class _PosterAndTitile extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: FadeInImage(
-              placeholder: AssetImage('assets/loading.gif'),
-              image: NetworkImage('https://placehold.co/200x300/png'),
+            child: SizedBox(
+              width: 120,
               height: 150,
+              child: _mealImage(meal['strMealThumb']),
             ),
           ),
-          const SizedBox(
-            width: 20,
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  meal['strMeal'] ?? 'Sense nom',
+                  style: Theme.of(context).textTheme.titleLarge,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  meal['strCategory'] ?? 'Sense categoria',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(
+                  meal['strArea'] ?? 'Origen desconegut',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
           ),
-          Column(
-            children: [
-              Text(
-                'Títol peli',
-                style: textTheme.headlineSmall,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-              Text(
-                'Títol original',
-                style: textTheme.titleMedium,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.star_outline, size: 15, color: Colors.grey),
-                  const SizedBox(width: 5),
-                  Text('Nota mitjana', style: textTheme.bodySmall),
-                ],
-              )
-            ],
-          )
         ],
       ),
     );
   }
 }
 
-class _Overview extends StatelessWidget {
+// INFORMACIO DE LA RECEPTA
+class _MealInfo extends StatelessWidget {
+  final Map<String, String?> meal;
+
+  const _MealInfo({required this.meal});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Text(
-        'Labore eiusmod ad reprehenderit irure eu sunt ex minim. Lorem fugiat Lorem proident duis ea cupidatat. Commodo duis culpa reprehenderit ad elit. Velit duis officia reprehenderit ullamco sint id anim officia est. Enim mollit nisi et exercitation dolore commodo. Cillum mollit laborum non nulla cillum non do reprehenderit Lorem deserunt ex eu sunt do.',
-        textAlign: TextAlign.justify,
-        style: Theme.of(context).textTheme.titleMedium,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Row(
+        children: [
+          const Icon(Icons.restaurant, color: Colors.indigo),
+          const SizedBox(width: 8),
+          Text(
+            'Categoria: ${meal['strCategory'] ?? 'No disponible'}',
+          ),
+          const Spacer(),
+          const Icon(Icons.public, color: Colors.indigo),
+          const SizedBox(width: 5),
+          Text(meal['strArea'] ?? 'No disponible'),
+        ],
       ),
     );
   }
+}
+
+// INGREDIENTS
+class _Ingredients extends StatelessWidget {
+  final Map<String, String?> meal;
+
+  const _Ingredients({required this.meal});
+
+  @override
+  Widget build(BuildContext context) {
+    final ingredients = <MapEntry<String, String>>[];
+
+    for (int i = 1; i <= 20; i++) {
+      final ingredient = meal['strIngredient$i']?.trim() ?? '';
+      final measure = meal['strMeasure$i']?.trim() ?? '';
+
+      if (ingredient.isNotEmpty) {
+        ingredients.add(MapEntry(ingredient, measure));
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Ingredients',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 10),
+          ...ingredients.map(
+            (item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.circle,
+                    size: 8,
+                    color: Colors.indigo,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(item.key)),
+                  Text(
+                    item.value,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// INSTRUCCIONS
+class _Instructions extends StatelessWidget {
+  final Map<String, String?> meal;
+
+  const _Instructions({required this.meal});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Preparació',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            meal['strInstructions'] ?? 'No hi ha instruccions disponibles.',
+            textAlign: TextAlign.justify,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+}
+
+// IMATGE AMB CONTROL D'ERROR
+Widget _mealImage(String? imageUrl) {
+  if (imageUrl == null || imageUrl.isEmpty) {
+    return Image.asset(
+      'assets/no-image.jpg',
+      fit: BoxFit.cover,
+    );
+  }
+
+  return Image.network(
+    imageUrl,
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+      return Image.asset(
+        'assets/no-image.jpg',
+        fit: BoxFit.cover,
+      );
+    },
+  );
 }
