@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:recipes_app/screens/screens.dart';
-import 'package:recipes_app/screens/search_screen.dart';
+import 'package:movies_app/screens/screens.dart';
+import 'package:movies_app/screens/search_screen.dart';
 
 void main() => runApp(MyApp());
 
