@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/screens/screens.dart';
-import 'package:movies_app/screens/search_screen.dart';
+import 'package:recipes_app/screens/screens.dart';
+import 'package:recipes_app/screens/search_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Pel·lícules',
+      title: 'Receptes',
       initialRoute: '/',
       routes: {
         '/': (BuildContext context) => const HomeScreen(),
